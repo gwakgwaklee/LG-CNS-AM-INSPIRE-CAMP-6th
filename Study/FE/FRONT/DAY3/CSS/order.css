@@ -1,0 +1,25 @@
+.accent {
+    color: red;
+}
+
+h2 {
+    text-align: center;
+    color: red;
+    font-size: 16px;
+}
+
+h2[text^="c"] {
+    color: blue
+}
+
+.text-small {
+    font-size: 1em;
+}
+
+.box {
+    border: 1px solid red;
+    border-radius: 11px;
+    font-size: 1.2em;
+    text-align: center;
+    line-height: 2em;
+}
