@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>scriptFunction</title>
+
+    <!-- Latest compiled and minified CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <!-- <button type="button" class="btn btn-primary" onclick="signInHandler()">SignIn
+            <span class="spinner-border spinner-border-sm"></span>
+        </button> -->
+
+        <button type="button" class="btn btn-primary" id="handler">SignIn
+            <span class="spinner-border spinner-border-sm"></span>
+        </button>
+
+    </div>
+
+    <script>
+        const signInHandler = () => {
+            window.alert(`signIn button click`)
+            console.log(`debug >>>> event ${event.target}`);
+            console.log(`debug >>>> event ${event.target.value}`);
+        }
+        // document.querySelector("#handler").onclick = () => {
+        //     window.alert(`handler button click`);
+        // }
+
+        // 이게 표준
+        document.querySelector("#handler").addEventListener('click', () => {
+            window.alert(`handler button click - addEventListener`);
+        })
+
+    </script>
+</body>
+
+</html>
