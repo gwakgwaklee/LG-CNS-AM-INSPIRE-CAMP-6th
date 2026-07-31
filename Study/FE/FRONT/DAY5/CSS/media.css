@@ -1,0 +1,28 @@
+/* 1. 모바일 (320px ~ 767px) */
+@media screen and (min-width: 320px) and (max-width: 767px) {
+    body {
+        background: url('../Img/bg.jpg') no-repeat;
+        color: red;
+        font-size: 100px;
+    }
+}
+
+/* 2. 태블릿 (768px ~ 1023px) */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+    body {
+        display: flex;
+        background: url('../Img/bg.jpg') no-repeat;
+        background-size: cover;
+        font-size: 200px;
+        color: yellow;
+    }
+}
+
+/* 3. 데스크탑 (1024px 이상) */
+@media screen and (min-width: 1024px) {
+    body {
+        background: url('../Img/bg.jpg') no-repeat;
+        font-size: 300px;
+        color: white;
+    }
+}

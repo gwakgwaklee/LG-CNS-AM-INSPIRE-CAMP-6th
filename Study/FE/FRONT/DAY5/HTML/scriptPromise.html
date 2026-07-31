@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promise</title>
+</head>
+
+<body>
+    <button type="button" id="btn">users</button>
+
+    <script>
+        // promise
+        // const promise = new Promise((reslove, reject) => {
+        //     setTimeout(() => {
+        //         // reslove({ status: 200, data: { message: `success` } });
+        //         reject({ status: 404 });
+        //     }, 5000);
+        // });
+
+        // promise
+        //     .then((respone) => {
+        //         console.log(`debug >>>> response`, respone);
+        //     }).catch(error => {
+        //         console.log(`debug >>>> error `, error);
+        //     });
+
+        // console.log(`debug >>>> promise `, promise);
+
+        document.querySelector("#btn").onclick = async (e) => {
+            // fetch(`../server/data.json`)
+            // fetch(`../server/users.json`)
+            //     .then(response => response.json())
+            //     .then(data => {
+            //         console.log(`debug >>>> data `, data);
+            //     }).catch(error => {
+            //         console.log(`debug >>>> error ${error}`);
+            //     });
+            try {
+                const response = await fetch(`../server/users.json`);
+                console.log(`debug >>>> response `, response);
+                const data = await response.json(); // JSON 파싱도 await 필요
+                console.log(`debug >>>> data `, data);
+
+            } catch (error) {
+                console.log(`debug >>>> data ${error}`)
+            }
+        }   
+    </script>
+</body>
+
+</html>
+
+</html>
