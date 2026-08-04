@@ -1,0 +1,164 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    /* .body -> body: body 태그에 직접 스타일을 적용합니다. */
+    margin: 0;
+    background-color: white;
+    color: black;
+}
+
+.header h1 {
+    text-align: center;
+    /* 헤더 h1 텍스트 중앙 정렬 (이미 되어있었지만, padding 수정) */
+    padding: 40px 20px 20px;
+    /* padding 구문 오류 수정 (쉼표 제거) */
+}
+
+.header {
+    margin: 0;
+    color: #777;
+    font-size: 14px;
+    text-align: center;
+    /* 헤더 전체 내용을 중앙 정렬합니다. */
+}
+
+/*<--------------- card style --------------------> */
+
+
+.card-container {
+    /* 이 클래스에 그리드 레이아웃을 적용합니다. */
+    display: grid;
+    /* 그리드 컨테이너로 설정 */
+    /* 화면 크기에 따라 최소 280px 너비의 카드를 자동으로 배치하고, 남은 공간을 균등하게 채웁니다. */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px 24px 60px;
+    justify-content: center;
+    /* 그리드 아이템들을 중앙에 정렬합니다. */
+}
+
+
+.card {
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px black;
+    animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(6px);
+    }
+}
+
+.card-img {
+    width: 100%;
+    height: 180px;
+    /* 160% -> 180px: 이미지 높이를 고정하여 레이아웃 안정화 */
+    object-fit: cover;
+    display: block
+}
+
+.card-body {
+    padding: 16px
+}
+
+.card-tag {
+    display: inline-block;
+    background: white;
+    color: yellow;
+    border-radius: 6px;
+    margin-bottom: 8px;
+}
+
+.card-title {
+    margin: 0 0 6px;
+    font-size: 17px;
+    font-weight: bold;
+}
+
+.card-desc {
+    margin: 0 0 12px;
+    font-size: 13px;
+    color: #777;
+
+}
+
+.card-price {
+    font-size: 17px;
+    font-weight: bold;
+    color: coral;
+}
+
+/* <------ skelecton style -------> */
+
+.skeleton-card {
+    background-color: white;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px black;
+}
+
+.skeleton-img {
+    width: 100%;
+    height: 180px;
+    /* 160% -> 180px: 스켈레톤 이미지 높이도 고정 */
+
+}
+
+.skeleton-body {
+    padding: 16px
+}
+
+.skeleton-line {
+    height: 12px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+
+.skeleton-line .short {
+    width: 40%;
+}
+
+.skeleton-line .title {
+    width: 70%;
+    height: 16px;
+}
+
+.skeleton-line .text {
+    width: 100%;
+
+}
+
+/* shimmer animation */
+
+.skeleton-img,
+.skeleton-line {
+    background: linear-gradient(90deg, #e8e8e8 color 25%, #f2f2f2 color 37%, #e8e8e8 color 63%);
+    background-size: 400% 100%;
+    animation: shimmer 1.4 ease infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        /* 시작 위치를 왼쪽으로 변경하여 자연스러운 흐름 */
+        background-position: -200% 0;
+    }
+
+    100% {
+        /* 끝 위치를 오른쪽으로 변경 */
+        background-position: 200% 0;
+    }
+
+}
