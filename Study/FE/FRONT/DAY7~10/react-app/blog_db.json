@@ -1,0 +1,44 @@
+{
+  "users": [
+    {
+      "id": "임정섭",
+      "email": "jslim9413",
+      "password": "1234"
+    },
+    {
+      "id": "hoyoon",
+      "email": "ahalgrgar1@naver.com",
+      "password": "hoyoon"
+    },
+    {
+      "name": "곽호윤",
+      "email": "ahalgrgar1@naver.com",
+      "password": "hoyoon",
+      "id": "kLuRmwY"
+    }
+  ],
+  "blogs": [
+    {
+      "title": "재택근무",
+      "content": "아리라리라리랑",
+      "category": "일상",
+      "email": "ahalgrgar1@naver.com",
+      "id": 1
+    },
+    {
+      "title": "golf",
+      "content": "전지훈련 ㄱㄱㄱ",
+      "category": "취미",
+      "email": "ahalgrgar1@naver.com",
+      "id": 2
+    }
+  ],
+  "comments": [
+    {
+      "blogId": 1,
+      "comment": "체크용\n",
+      "email": "ahalgrgar1@naver.com",
+      "id": 5
+    }
+  ]
+}
