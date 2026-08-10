@@ -174,8 +174,12 @@ const BlogIndexPage = () => {
                 <ButtonRow>
                     <Button title='글 작성하기'
                         onClick={(e) => writeHandler(e)}></Button>
-                    <Button title='로그아웃'></Button>
+                    <Button title='로그아웃'
+                        onClick={(e) => moveUrl("/")} ></Button>
                     <Button title='기상예보'></Button>
+                    <Button title='OpenAPI'
+                        onClick={() => moveUrl('/openapi/index')}>
+                    </Button>
                 </ButtonRow>
 
                 <CategoryRow>
@@ -193,7 +197,7 @@ const BlogIndexPage = () => {
                 <BlogList ary={filteredBlogs || []} />
 
             </Container>
-        </Wrapper>
+        </Wrapper >
     );
 }
 export default BlogIndexPage;

@@ -15,6 +15,18 @@
       "email": "ahalgrgar1@naver.com",
       "password": "hoyoon",
       "id": "kLuRmwY"
+    },
+    {
+      "name": "호윤",
+      "email": "ahalgrgar123@g",
+      "password": "",
+      "id": "7IaVNu6"
+    },
+    {
+      "name": "AM06_곽호윤",
+      "email": "ahalgrgar123@gmail.com",
+      "password": "hoyoon",
+      "id": "s-flp4m"
     }
   ],
   "blogs": [
@@ -39,6 +51,18 @@
       "comment": "체크용\n",
       "email": "ahalgrgar1@naver.com",
       "id": 5
+    },
+    {
+      "blogId": 1,
+      "comment": "ㅁㄴㅇㅁ",
+      "email": "ahalgrgar1@naver.com",
+      "id": 6
+    },
+    {
+      "blogId": 1,
+      "comment": "asdas",
+      "email": "ahalgrgar1@naver.com",
+      "id": 7
     }
   ]
 }

@@ -223,6 +223,32 @@ const BlogReadPage = () => {
 
     }
 
+    // comment update
+    const commentUpdateHandler = async (id, mention) => {
+        console.log(`debug >>>> commentUpdateHandler event`)
+        console.log(`debug >>>> commentUpdateHandler id${id}, mention${mention}`)
+
+        // update : axios put(전체교체), patch (부분 수정)
+
+        await api.patch(`/comments/${id}`, {
+            comment: mention
+        })
+            .then(response => {
+                console.log(`debug >>>> axios request success`, response);
+                if (response.status === 200) {
+                    setComments(ary => {
+                        return ary.map(comment => {
+                            return comment.id === id ? { ...comment, comment: mention } : comments
+                        })
+                    })
+                }
+
+            }).catch(error => {
+                console.log(`debug >>>> axios request error`, error);
+            });
+
+    };
+
 
     return (
         <Wrapper>
@@ -234,7 +260,7 @@ const BlogReadPage = () => {
 
                     <Button title='메인페이지'
                         onClick={() => {
-                            moveUrl('/blog/index');
+                            moveUrl('/blogs/index');
                         }} />
 
                     <PostContainer>
@@ -247,7 +273,8 @@ const BlogReadPage = () => {
 
                     {/*BlogComentList */}
                     <BlogCommentList comments={comments || []}
-                        handler={commentDeleteHandler} />
+                        handler={commentDeleteHandler}
+                        updateHandler={commentUpdateHandler} />
 
                     {/* 댓글 입력과 이벤트 */}
                     <TextInput height={14}

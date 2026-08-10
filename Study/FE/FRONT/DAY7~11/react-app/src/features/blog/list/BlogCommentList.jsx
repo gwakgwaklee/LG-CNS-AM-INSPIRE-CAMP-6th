@@ -17,7 +17,7 @@ const Wrapper = styled.div`
     }
 `;
 
-const BlogCommentList = ({ comments, handler }) => {
+const BlogCommentList = ({ comments, handler, updateHandler }) => {
     return (
         <Wrapper>
             {
@@ -26,6 +26,7 @@ const BlogCommentList = ({ comments, handler }) => {
                         key={idx}
                         comment={comment}
                         handler={handler}
+                        updateHandler={updateHandler}
                     />
                 })
             }

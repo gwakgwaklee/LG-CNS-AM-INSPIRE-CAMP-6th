@@ -1,0 +1,1676 @@
+diff --git a/Study/FE/FRONT/DAY7~10/react-app/blog_db.json b/Study/FE/FRONT/DAY7~10/react-app/blog_db.json
+index 8a34473..87c9e6e 100644
+--- a/Study/FE/FRONT/DAY7~10/react-app/blog_db.json
++++ b/Study/FE/FRONT/DAY7~10/react-app/blog_db.json
+@@ -15,6 +15,18 @@
+       "email": "ahalgrgar1@naver.com",
+       "password": "hoyoon",
+       "id": "kLuRmwY"
++    },
++    {
++      "name": "호윤",
++      "email": "ahalgrgar123@g",
++      "password": "",
++      "id": "7IaVNu6"
++    },
++    {
++      "name": "AM06_곽호윤",
++      "email": "ahalgrgar123@gmail.com",
++      "password": "hoyoon",
++      "id": "s-flp4m"
+     }
+   ],
+   "blogs": [
+@@ -39,6 +51,18 @@
+       "comment": "체크용\n",
+       "email": "ahalgrgar1@naver.com",
+       "id": 5
++    },
++    {
++      "blogId": 1,
++      "comment": "ㅁㄴㅇㅁ",
++      "email": "ahalgrgar1@naver.com",
++      "id": 6
++    },
++    {
++      "blogId": 1,
++      "comment": "asdas",
++      "email": "ahalgrgar1@naver.com",
++      "id": 7
+     }
+   ]
+ }
+\ No newline at end of file
+diff --git a/Study/FE/FRONT/DAY7~10/react-app/public/index.html b/Study/FE/FRONT/DAY7~10/react-app/public/index.html
+index a25d574..12c19f6 100644
+--- a/Study/FE/FRONT/DAY7~10/react-app/public/index.html
++++ b/Study/FE/FRONT/DAY7~10/react-app/public/index.html
+@@ -23,6 +23,10 @@
+       Learn how to configure a non-root public URL by running `npm run build`.
+     -->
+   <title>React App</title>
++
++  <!-- %REACT_APP_KAKAO_MAP_KEY% 로 작성 -->
++  <script type="text/javascript"
++    src="//dapi.kakao.com/v2/maps/sdk.js?appkey=%REACT_APP_KAKAO_MAP_API_KEY%&autoload=false&libraries=services"></script>
+ </head>
+ 
+ <body>
+diff --git a/Study/FE/FRONT/DAY7~10/react-app/src/ToyApp.js b/Study/FE/FRONT/DAY7~10/react-app/src/ToyApp.js
+index 6d9edf4..eec5dea 100644
+--- a/Study/FE/FRONT/DAY7~10/react-app/src/ToyApp.js
++++ b/Study/FE/FRONT/DAY7~10/react-app/src/ToyApp.js
+@@ -1,32 +1,34 @@
+ import { BrowserRouter, Route, Routes } from "react-router-dom";
+ 
+ 
+-import BlogIndexPage    from "./features/blog/page/BlogIndexPage";
+-import BlogReadPage     from "./features/blog/page/BlogReadPage";
+-import BlogWritePage    from "./features/blog/page/BlogWritePage";
+-import SignInPage       from "./features/user/page/SignInPage";
+-import SignUpPage       from "./features/user/page/SignUpPage";
+-
++import BlogIndexPage from "./features/blog/page/BlogIndexPage";
++import BlogReadPage from "./features/blog/page/BlogReadPage";
++import BlogWritePage from "./features/blog/page/BlogWritePage";
++import SignInPage from "./features/user/page/SignInPage";
++import SignUpPage from "./features/user/page/SignUpPage";
++import WeatherPage from "./features/openapi/page/WeatherPage"
+ 
+ 
+ const ToyApp = () => {
+-    return(
++    return (
+         <BrowserRouter>
+             <Routes>
+                 {/* user */}
+-                <Route path="/"                     element={ <SignUpPage />} />
+-                <Route path="/users/signIn"         element={ <SignInPage />} />
++                <Route path="/" element={<SignUpPage />} />
++                <Route path="/users/signIn" element={<SignInPage />} />
++
+ 
+                 {/* blog */}
+-                <Route path="/blogs/index"          element={ <BlogIndexPage />} />
+-                <Route path="/blogs/write"          element={ <BlogWritePage />} />
+-                <Route path="/blogs/read/:blogId"   element={ <BlogReadPage />} />
+-                
+-                {/* blog - comment */}
++                <Route path="/blogs/index" element={<BlogIndexPage />} />
++                <Route path="/blogs/write" element={<BlogWritePage />} />
++                <Route path="/blogs/read/:blogId" element={<BlogReadPage />} />
++
++                {/* open api */}
++                <Route path="/openapi/index" element={<WeatherPage />} />
+ 
+             </Routes>
+         </BrowserRouter>
+     )
+ }
+ 
+-export default ToyApp ;
+\ No newline at end of file
++export default ToyApp;
+\ No newline at end of file
+diff --git a/Study/FE/FRONT/DAY7~10/react-app/src/components/styled/TextInput.jsx b/Study/FE/FRONT/DAY7~10/react-app/src/components/styled/TextInput.jsx
+index b5d09d2..e568b28 100644
+--- a/Study/FE/FRONT/DAY7~10/react-app/src/components/styled/TextInput.jsx
++++ b/Study/FE/FRONT/DAY7~10/react-app/src/components/styled/TextInput.jsx
+@@ -14,14 +14,14 @@ const StyledTextArea = styled.textarea`
+     margin-top  : 16px ;
+ `;
+ 
+-const TextInput = ({height, value, handler, disabled}) => {
+-    return(
+-        <StyledTextArea 
+-                    height={height}
+-                    value={value}
+-                    onChange={handler}
+-                    disabled={disabled} />
++const TextInput = ({ height, value, handler, disabled }) => {
++    return (
++        <StyledTextArea
++            height={height}
++            value={value || ''}
++            onChange={handler}
++            disabled={disabled} />
+     );
+ }
+ 
+-export default TextInput ; 
++export default TextInput; 
+diff --git a/Study/FE/FRONT/DAY7~10/react-app/src/features/blog/item/BlogCommentItem.jsx b/Study/FE/FRONT/DAY7~10/react-app/src/features/blog/item/BlogCommentItem.jsx
+index 9d4a48f..d5e28af 100644
+--- a/Study/FE/FRONT/DAY7~10/react-app/src/features/blog/item/BlogCommentItem.jsx
++++ b/Study/FE/FRONT/DAY7~10/react-app/src/features/blog/item/BlogCommentItem.jsx
+@@ -1,5 +1,7 @@
+ import styled from "styled-components"
+ import Button from "../../../components/styled/Button"
++import TextInput from "../../../components/styled/TextInput";
++import { useEffect, useState } from "react";
+ 
+ 
+ const Wrapper = styled.div`
+@@ -24,19 +26,59 @@ const CommentText = styled.p`
+ `;
+ 
+ 
+-const BlogCommentItem = ({ comment, handler }) => {
++const BlogCommentItem = ({ comment, handler, updateHandler }) => {
+ 
++
++
++    const [isEdit, setIsEdit] = useState(false);
++    const [mention, setMention] = useState('');
+     //로그인 사용자 이메일
+     const user = localStorage.getItem('user');
+ 
++
++    const updateMentionHandler = (id, mention) => {
++        if (!isEdit) {
++            // 수정모드 ON
++            setIsEdit(true);
++        } else {
++            /* 
++            SQL
++            - update table
++                set column = vaule
++                where commentId
++                where id = ?;
++            - 선택된 특정 댓글의 기본 키 값을 가지고 사용자가 입력한 값으로 수정
++            - UI - 일부 리렌더링(댓글 목록만)
++            - 당연히 json-server 수정이 되어야 함
++            */
++            // 수정완료모드 ON
++            updateHandler(comment.id, mention); // ReadPage : commentUpdateHandler
++            setIsEdit(false);
++        }
++    }
++    useEffect(() => {
++        if (comment?.comment) {
++            setMention(comment.comment);
++        }
++    }, [comment.comment]);
++
++
+     return (
+         <Wrapper>
+-            <CommentText>{comment.comment}</CommentText>
++            {/*<CommentText>{comment.comment}</CommentText>*/}
++            <TextInput
++                height={16}
++                value={mention}
++                handler={(e) => setMention(e.target.value)}
++                disabled={!isEdit}
++            />
+             {
+                 user === comment.email &&
+                 <div>
+                     <Button title='삭제'
+-                        onClick={(e) => handler(e, comment.id)}
++                        onClick={(e) => handler(e, comment.id)} />
++                    <Button title={isEdit ? '수정완료' : '수정'}
++                        onClick={(e) => updateMentionHandler(e)}
+                     />
+                 </div>
+             }
+diff --git a/Study/FE/FRONT/DAY7~10/react-app/src/features/blog/list/BlogCommentList.jsx b/Study/FE/FRONT/DAY7~10/react-app/src/features/blog/list/BlogCommentList.jsx
+index dc66c1a..bcebd16 100644
+--- a/Study/FE/FRONT/DAY7~10/react-app/src/features/blog/list/BlogCommentList.jsx
++++ b/Study/FE/FRONT/DAY7~10/react-app/src/features/blog/list/BlogCommentList.jsx
+@@ -17,7 +17,7 @@ const Wrapper = styled.div`
+     }
+ `;
+ 
+-const BlogCommentList = ({ comments, handler }) => {
++const BlogCommentList = ({ comments, handler, updateHandler }) => {
+     return (
+         <Wrapper>
+             {
+@@ -26,6 +26,7 @@ const BlogCommentList = ({ comments, handler }) => {
+                         key={idx}
+                         comment={comment}
+                         handler={handler}
++                        updateHandler={updateHandler}
+                     />
+                 })
+             }
+diff --git a/Study/FE/FRONT/DAY7~10/react-app/src/features/blog/page/BlogIndexPage.jsx b/Study/FE/FRONT/DAY7~10/react-app/src/features/blog/page/BlogIndexPage.jsx
+index 2f278e1..9d7f82d 100644
+--- a/Study/FE/FRONT/DAY7~10/react-app/src/features/blog/page/BlogIndexPage.jsx
++++ b/Study/FE/FRONT/DAY7~10/react-app/src/features/blog/page/BlogIndexPage.jsx
+@@ -174,8 +174,12 @@ const BlogIndexPage = () => {
+                 <ButtonRow>
+                     <Button title='글 작성하기'
+                         onClick={(e) => writeHandler(e)}></Button>
+-                    <Button title='로그아웃'></Button>
++                    <Button title='로그아웃'
++                        onClick={(e) => moveUrl("/")} ></Button>
+                     <Button title='기상예보'></Button>
++                    <Button title='OpenAPI'
++                        onClick={() => moveUrl('/openapi/index')}>
++                    </Button>
+                 </ButtonRow>
+ 
+                 <CategoryRow>
+@@ -193,7 +197,7 @@ const BlogIndexPage = () => {
+                 <BlogList ary={filteredBlogs || []} />
+ 
+             </Container>
+-        </Wrapper>
++        </Wrapper >
+     );
+ }
+ export default BlogIndexPage;
+diff --git a/Study/FE/FRONT/DAY7~10/react-app/src/features/blog/page/BlogReadPage.jsx b/Study/FE/FRONT/DAY7~10/react-app/src/features/blog/page/BlogReadPage.jsx
+index b944384..bb8e4f1 100644
+--- a/Study/FE/FRONT/DAY7~10/react-app/src/features/blog/page/BlogReadPage.jsx
++++ b/Study/FE/FRONT/DAY7~10/react-app/src/features/blog/page/BlogReadPage.jsx
+@@ -223,6 +223,32 @@ const BlogReadPage = () => {
+ 
+     }
+ 
++    // comment update
++    const commentUpdateHandler = async (id, mention) => {
++        console.log(`debug >>>> commentUpdateHandler event`)
++        console.log(`debug >>>> commentUpdateHandler id${id}, mention${mention}`)
++
++        // update : axios put(전체교체), patch (부분 수정)
++
++        await api.patch(`/comments/${id}`, {
++            comment: mention
++        })
++            .then(response => {
++                console.log(`debug >>>> axios request success`, response);
++                if (response.status === 200) {
++                    setComments(ary => {
++                        return ary.map(comment => {
++                            return comment.id === id ? { ...comment, comment: mention } : comments
++                        })
++                    })
++                }
++
++            }).catch(error => {
++                console.log(`debug >>>> axios request error`, error);
++            });
++
++    };
++
+ 
+     return (
+         <Wrapper>
+@@ -234,7 +260,7 @@ const BlogReadPage = () => {
+ 
+                     <Button title='메인페이지'
+                         onClick={() => {
+-                            moveUrl('/blog/index');
++                            moveUrl('/blogs/index');
+                         }} />
+ 
+                     <PostContainer>
+@@ -247,7 +273,8 @@ const BlogReadPage = () => {
+ 
+                     {/*BlogComentList */}
+                     <BlogCommentList comments={comments || []}
+-                        handler={commentDeleteHandler} />
++                        handler={commentDeleteHandler}
++                        updateHandler={commentUpdateHandler} />
+ 
+                     {/* 댓글 입력과 이벤트 */}
+                     <TextInput height={14}
+diff --git a/Study/FE/FRONT/DAY7~10/react-app/today_code.txt b/Study/FE/FRONT/DAY7~10/react-app/today_code.txt
+index 7a46e0b..f5b0d97 100644
+--- a/Study/FE/FRONT/DAY7~10/react-app/today_code.txt
++++ b/Study/FE/FRONT/DAY7~10/react-app/today_code.txt
+@@ -1,823 +0,0 @@
+-diff --git a/Study/FE/FRONT/DAY7~8/react-app/db.json b/Study/FE/FRONT/DAY7~8/react-app/db.json
+-index 9fa73d6..93213c2 100644
+---- a/Study/FE/FRONT/DAY7~8/react-app/db.json
+-+++ b/Study/FE/FRONT/DAY7~8/react-app/db.json
+-@@ -1,23 +1,31 @@
+- {
+-     "comment": [
+-         {
+--            "writer": "임정섭",
+--            "comment": "강사님과 함께하는 즐거운 Raect..."
+--        },
+--        {
+--            "writer": "차현준",
+--            "comment": "강사님과 함께하는 재미없는 Raect..."
+--        },
+--        {
+--            "writer": "박선아",
+--            "comment": "강사님과 함께하는 재미있는 Raect..."
+--        }
+--    ],
+--    "users": [
+--        {
+--            "name": "임정섭",
+--            "email": "jslim9413",
+--            "pswd": "1234"
+-+            "comment": [
+-+                {
+-+                    "id": 1,
+-+                    "writer": "임정섭",
+-+                    "comment": "강사님과 함께하는 즐거운 Raect..."
+-+                },
+-+                {
+-+                    "id": 2,
+-+                    "writer": "차현준",
+-+                    "comment": "강사님과 함께하는 재미없는 Raect..."
+-+                },
+-+                {
+-+                    "id": 3,
+-+                    "writer": "박선아",
+-+                    "comment": "강사님과 함께하는 재미있는 Raect..."
+-+                }
+-+            ],
+-+            "users": [
+-+                {
+-+                    "id": 1,
+-+                    "name": "임정섭",
+-+                    "email": "jslim9413",
+-+                    "pswd": "1234"
+-+                }
+-+            ]
+-         }
+-     ]
+- }
+-\ No newline at end of file
+-diff --git a/Study/FE/FRONT/DAY7~8/react-app/public/index.html b/Study/FE/FRONT/DAY7~8/react-app/public/index.html
+-index aa069f2..a25d574 100644
+---- a/Study/FE/FRONT/DAY7~8/react-app/public/index.html
+-+++ b/Study/FE/FRONT/DAY7~8/react-app/public/index.html
+-@@ -1,21 +1,19 @@
+- <!DOCTYPE html>
+- <html lang="en">
+--  <head>
+--    <meta charset="utf-8" />
+--    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+--    <meta name="viewport" content="width=device-width, initial-scale=1" />
+--    <meta name="theme-color" content="#000000" />
+--    <meta
+--      name="description"
+--      content="Web site created using create-react-app"
+--    />
+--    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+--    <!--
+-+
+-+<head>
+-+  <meta charset="utf-8" />
+-+  <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+-+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+-+  <meta name="theme-color" content="#000000" />
+-+  <meta name="description" content="Web site created using create-react-app" />
+-+  <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+-+  <!--
+-       manifest.json provides metadata used when your web app is installed on a
+-       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
+-     -->
+--    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+--    <!--
+-+  <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+-+  <!--
+-       Notice the use of %PUBLIC_URL% in the tags above.
+-       It will be replaced with the URL of the `public` folder during the build.
+-       Only files inside the `public` folder can be referenced from the HTML.
+-@@ -24,12 +22,13 @@
+-       work correctly both with client-side routing and a non-root public URL.
+-       Learn how to configure a non-root public URL by running `npm run build`.
+-     -->
+--    <title>React App</title>
+--  </head>
+--  <body>
+--    <noscript>You need to enable JavaScript to run this app.</noscript>
+--    <div id="root"></div>
+--    <!--
+-+  <title>React App</title>
+-+</head>
+-+
+-+<body>
+-+  <noscript>You need to enable JavaScript to run this app.</noscript>
+-+  <div id="root"></div>
+-+  <!--
+-       This HTML file is a template.
+-       If you open it directly in the browser, you will see an empty page.
+- 
+-@@ -39,5 +38,6 @@
+-       To begin the development, run `npm start` or `yarn start`.
+-       To create a production bundle, use `npm run build` or `yarn build`.
+-     -->
+--  </body>
+--</html>
+-+</body>
+-+
+-+</html>
+-\ No newline at end of file
+-diff --git a/Study/FE/FRONT/DAY7~8/react-app/src/api/axios.js b/Study/FE/FRONT/DAY7~8/react-app/src/api/axios.js
+-index 3dba6a8..156a802 100644
+---- a/Study/FE/FRONT/DAY7~8/react-app/src/api/axios.js
+-+++ b/Study/FE/FRONT/DAY7~8/react-app/src/api/axios.js
+-@@ -1,8 +1,17 @@
+-+// 기존 코드 (활성화)
+- import axios from 'axios'
+- const endPoint = process.env.REACT_APP_BACKEND_ENDPOINT;
+--
+- const api = axios.create({
+-     baseURL: endPoint
+- })
+-+export default api
+- 
+--export default api;
+-\ No newline at end of file
+-+// 새로운 코드 (주석 처리)
+-+// import axios from 'axios';
+-+// const instance = axios.create({
+-+//     baseURL: 'http://localhost:3001', // JSON Server가 3001 포트에서 실행된다고 가정
+-+//     headers: {
+-+//         'Content-Type': 'application/json',
+-+//     },
+-+// });
+-+// export default instance;
+-\ No newline at end of file
+-diff --git a/Study/FE/FRONT/DAY7~8/react-app/src/components/rendering/LoginButton.jsx b/Study/FE/FRONT/DAY7~8/react-app/src/components/rendering/LoginButton.jsx
+-index e69de29..78c82a5 100644
+---- a/Study/FE/FRONT/DAY7~8/react-app/src/components/rendering/LoginButton.jsx
+-+++ b/Study/FE/FRONT/DAY7~8/react-app/src/components/rendering/LoginButton.jsx
+-@@ -0,0 +1,15 @@
+-+import Button from "../styled/Button"
+-+
+-+const LoginButton = (props) => {
+-+    const loginHandler = (setFlag) => {
+-+        setFlag(true);
+-+    }
+-+    return (
+-+        <div>
+-+            <Button title={`로그인`}
+-+                onClick={() => loginHandler(props.isLogin)}></Button>
+-+        </div>
+-+    )
+-+}
+-+
+-+export default LoginButton;
+-\ No newline at end of file
+-diff --git a/Study/FE/FRONT/DAY7~8/react-app/src/components/rendering/LogoutButton.jsx b/Study/FE/FRONT/DAY7~8/react-app/src/components/rendering/LogoutButton.jsx
+-index 8fd407a..3a7bc96 100644
+---- a/Study/FE/FRONT/DAY7~8/react-app/src/components/rendering/LogoutButton.jsx
+-+++ b/Study/FE/FRONT/DAY7~8/react-app/src/components/rendering/LogoutButton.jsx
+-@@ -7,7 +7,7 @@ const LogoutButton = (props) => {
+-     return (
+-         <div>
+-             <Button title={`로그아웃`}
+--                onclick={() => logoutHandler(props.isLogin)}></Button>
+-+                onClick={() => logoutHandler(props.isLogin)}></Button>
+-         </div>
+-     )
+- }
+-diff --git a/Study/FE/FRONT/DAY7~8/react-app/src/index.css b/Study/FE/FRONT/DAY7~8/react-app/src/index.css
+-index ec2585e..56c88db 100644
+---- a/Study/FE/FRONT/DAY7~8/react-app/src/index.css
+-+++ b/Study/FE/FRONT/DAY7~8/react-app/src/index.css
+-@@ -1,3 +1,9 @@
+-+html,
+-+body {
+-+  min-height: 100vh;
+-+  /* 뷰포트 전체 높이를 차지하도록 설정 */
+-+}
+-+
+- body {
+-   margin: 0;
+-   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+-@@ -5,9 +11,11 @@ body {
+-     sans-serif;
+-   -webkit-font-smoothing: antialiased;
+-   -moz-osx-font-smoothing: grayscale;
+-+  background-color: #e0f7fa;
+-+  /* 시원한 연한 하늘색 배경색 */
+- }
+- 
+- code {
+-   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+-     monospace;
+--}
+-+}
+-\ No newline at end of file
+-diff --git a/Study/FE/FRONT/DAY7~8/react-app/src/index.js b/Study/FE/FRONT/DAY7~8/react-app/src/index.js
+-index e2deefe..1c3fdfa 100644
+---- a/Study/FE/FRONT/DAY7~8/react-app/src/index.js
+-+++ b/Study/FE/FRONT/DAY7~8/react-app/src/index.js
+-@@ -2,6 +2,7 @@ import React from 'react';
+- import ReactDOM from 'react-dom/client';
+- import './index.css';
+- import App from './App';
+-+import 'bootstrap/dist/css/bootstrap.min.css'; // Bootstrap CSS 추가
+- import reportWebVitals from './reportWebVitals';
+- import Librarypage from './pages/sample/LibrayPage';
+- import ButtonPage from './pages/material/ButtonPage';
+-@@ -47,17 +48,24 @@ import ButtonPage from './pages/material/ButtonPage';
+- //     <EventPage />
+- // );
+- 
+--import TestRouterApp from './TestRouterApp';
+--const root = ReactDOM.createRoot(document.getElementById('root'));
+--root.render(
+--    <TestRouterApp />
+--);
+-+// import TestRouterApp from './TestRouterApp';
+-+// const root = ReactDOM.createRoot(document.getElementById('root'));
+-+// root.render(
+-+//     <TestRouterApp />
+-+// );
+- 
+- // import RenderingPage from './pages/rendering/RenderingPage';
+- // const root = ReactDOM.createRoot(document.getElementById('root'));
+- // root.render(
+- //     <RenderingPage />
+- // );
+-+
+-+import ToyApp from './ToyApp'; // Import ToyApp
+-+const root = ReactDOM.createRoot(document.getElementById('root'));
+-+root.render(
+-+    <ToyApp />
+-+);
+-+
+- // If you want to start measuring performance in your app, pass a function
+- // to log results (for example: reportWebVitals(console.log))
+- // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+-diff --git a/Study/FE/FRONT/DAY7~8/react-app/src/pages/rendering/RenderingPage.jsx b/Study/FE/FRONT/DAY7~8/react-app/src/pages/rendering/RenderingPage.jsx
+-index 4861632..737d586 100644
+---- a/Study/FE/FRONT/DAY7~8/react-app/src/pages/rendering/RenderingPage.jsx
+-+++ b/Study/FE/FRONT/DAY7~8/react-app/src/pages/rendering/RenderingPage.jsx
+-@@ -1,7 +1,7 @@
+- import { useState } from "react";
+- import Greeting from "../../components/rendering/Greeting";
+- import LogoutButton from "../../components/rendering/LogoutButton"
+--
+-+import LoginButton from "../../components/rendering/LoginButton";
+- const RenderingPage = () => {
+-     // Script 
+-     const [flag, setFlag] = useState(false);
+-@@ -15,8 +15,7 @@ const RenderingPage = () => {
+-                 flag ?
+-                     <LogoutButton isLogin={setFlag} />
+-                     :
+--                    ''
+--                // <LoginButton isLogin={setFlag} />
+-+                    <LoginButton isLogin={setFlag} />
+- 
+-             }
+-         </div>
+-diff --git a/Study/FE/FRONT/DAY7~8/react-app/today_code.txt b/Study/FE/FRONT/DAY7~8/react-app/today_code.txt
+-index 50cfeb2..1870371 100644
+---- a/Study/FE/FRONT/DAY7~8/react-app/today_code.txt
+-+++ b/Study/FE/FRONT/DAY7~8/react-app/today_code.txt
+-@@ -1,544 +0,0 @@
+--/* ==== File: src/App.js ==== */
+--import logo from './logo.svg';
+--import './App.css';
+--import '../src/styles/test.css'
+--
+--import { CommentPage as Application } from './pages/sample/CommentPage';
+--import LibrayPage from './pages/sample/LibrayPage';
+--function App() {
+--  return (
+--    // <div className="App">
+--    //   <header className="App-header">
+--    //     <img src={logo} className="App-logo" alt="logo" />
+--    //     <p>
+--    //       Edit <code>src/App.js</code> and save to reload.
+--    //     </p>
+--    //     <a
+--    //       className="App-link"
+--    //       href="https://reactjs.org"
+--    //       target="_blank"
+--    //       rel="noopener noreferrer"
+--    //     >
+--    //       Learn React
+--    //     </a>
+--    //   </header>
+--    // </div>
+--
+--    <div>
+--      <center><span className="accent">섭섭이와 함께하는 즐거운 React</span></center>
+--      <Application />
+--    </div>
+--  );
+--}
+--
+--export default App;
+--
+--
+--/* ==== File: src/components/styled/Button.jsx ==== */
+--
+--//
+--
+--import styled from "styled-components";
+--
+--const StyledButton = styled.button`
+--    padding: 8px 16px;
+--    font-size : 16px;
+--    border-radius : 8px;
+--    cursor: pointer
+--`;
+--
+--const Button = (props) => {
+--    return (
+--        <StyledButton
+--            onClick={props.onClick}
+--            disabled={props.disabled}
+--        >{props.title}</StyledButton >
+--    );
+--}
+--
+--export default Button;
+--
+--/* ==== File: src/index.js ==== */
+--import React from 'react';
+--import ReactDOM from 'react-dom/client';
+--import './index.css';
+--import App from './App';
+--import reportWebVitals from './reportWebVitals';
+--import Librarypage from './pages/sample/LibrayPage';
+--import ButtonPage from './pages/material/ButtonPage';
+--// import CommentPage from './pages/sample/CommentPage';
+--
+--
+--
+--// const root = ReactDOM.createRoot(document.getElementById('root'));
+--// root.render(
+--//   <React.StrictMode>
+--//     <App />
+--//   </React.StrictMode>
+--// );
+--
+--
+--// import CapacityPage from './pages/reactive/CapacityPage'
+--// const root = ReactDOM.createRoot(document.getElementById('root'));
+--// root.render(
+--//   // <App />
+--//   //<ButtonPage />
+--//   //<CommentPage />
+--//   <CapacityPage />
+--// );
+--
+--// import { CommentPage as Application } from './pages/sample/CommentPage';
+--// const root = ReactDOM.createRoot(document.getElementById('root'));
+--// root.render(
+--//     <Application />
+--// );
+--
+--// const root = ReactDOM.createRoot(document.getElementById('root'));
+--// root.render(
+--//   // <App />
+--//   //<ButtonPage />
+--//   <CommentPage />
+--// );
+--
+--
+--// 트러블 슈팅 일어났음 
+--// import EventPage from './pages/event/EventPage';
+--// const root = ReactDOM.createRoot(document.getElementById('root'));
+--// root.render(
+--//     <EventPage />
+--// );
+--
+--import TestRouterApp from './TestRouterApp';
+--const root = ReactDOM.createRoot(document.getElementById('root'));
+--root.render(
+--    <TestRouterApp />
+--);
+--
+--// import RenderingPage from './pages/rendering/RenderingPage';
+--// const root = ReactDOM.createRoot(document.getElementById('root'));
+--// root.render(
+--//     <RenderingPage />
+--// );
+--// If you want to start measuring performance in your app, pass a function
+--// to log results (for example: reportWebVitals(console.log))
+--// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+--reportWebVitals();
+--
+--
+--/* ==== File: src/pages/reactive/CapacityPage.jsx ==== */
+--import Button from '../../components/styled/Button';
+--import { useState, useEffect } from 'react';
+--
+--const CapacityPage = () => {
+--
+--    // cnt = 변수, setCnt = 함수
+--    let [cnt, setCnt] = useState(0);
+--    let [full, setFull] = useState(false)
+--    let [empty, setEmpty] = useState(false);
+--
+--    const capacity = 10;
+--
+--    // console.log(`debug >>>> CapacityPage life cycle upmount `);
+--    //let cnt = 0;
+--
+--    const upCntHandler = (e) => {
+--        setCnt(cnt => cnt + 1);
+--        // console.log(`debug >>>> CapacityPage load event `, cnt);
+--    }
+--
+--    const downCntHandler = (e) => {
+--        setCnt(cnt => cnt - 1)
+--        // console.log(`debug >>>> CapacityPage load event `, cnt)
+--    }
+--
+--    // side effect으로 렌더링 이후 작업이 필요한 경우 
+--    // useEffect() 함수를 이용해서 작업 할 수 있다.
+--    useEffect(() => {
+--        console.log("debug >>>> size effect rander mount!");
+--    }, []);
+--
+--    useEffect(() => {
+--        console.log(`CapacityPage life cycle update`);
+--        console.log(`debug >>>> size effect rander cnt :  ${cnt}`);
+--        setFull(cnt >= capacity)
+--        setEmpty(cnt <= 0);
+--    }, [cnt]);
+--    /*
+--    - 입장 인원 10명
+--    - 입장, 퇴장 버튼을 만든다.
+--    - 입장 버튼을 클릭하면 인원수가 증가되고 입장인원이 꽉차면 버튼을 비활성화 시킨다.
+--    - 퇴장 버튼을 클릭하면 인원수가 감소되고 인원이 0이되면 버튼을 비활성화 시킨다.
+--    */
+--    // 함수 호출 시 매개 변수 전달 x 
+--    // 매개 변수(props) 필요시 => 형식으로 
+--    return (
+--        <div>
+--            <p>입장인원 : {cnt}</p>
+--            <Button
+--                title="입장"
+--                onClick={(e) => upCntHandler()}
+--                disabled={full}
+--            />
+--
+--            <Button
+--                title="퇴장"
+--                onClick={(e) => downCntHandler()}
+--                disabled={empty}
+--            />
+--        </div>
+--    );
+--
+--}
+--
+--export default CapacityPage;
+--
+--/* ==== File: src/pages/sample/CommentPage.jsx ==== */
+--import api from '../../api/axios';
+--import Comment from '../../components/sample/Comment';
+--import { useEffect, useState } from 'react';
+--export const CommentPage = () => {
+--    console.log(`debug >>>> CommentPage load event `);
+--
+--    // useState
+--    const [comments, setComments] = useState([]);
+--
+--    // 1. 더미 데이터 구조 수정 (객체 배열 형태로 변경)
+--    // let comments = [
+--    //     {
+--    //         "writer": "임정섭",
+--    //         "comment": "강사님과 함께하는 즐거운 React..."
+--    //     },
+--    //     {
+--    //         "writer": "차현준",
+--    //         "comment": "강사님과 함께하는 재미없는 React..."
+--    //     },
+--    //     {
+--    //         "writer": "박선아",
+--    //         "comment": "강사님과 함께하는 재미있는 React..."
+--    //     }
+--    // ];
+--    const loadData = async () => {
+--        await api.get('/comment')
+--            .then(response => {
+--                console.log(`debug >>>> response `, response.data);
+--                setComments(response.data);
+--            })
+--            .catch(err => {
+--                console.log(`debug >>>> err `, err);
+--            });
+--    }
+--    useEffect(() => {
+--        loadData();
+--    }, [])
+--
+--    // ui
+--    return (
+--        <div>
+--            {
+--                // 안전한 code ?를 넣어 
+--                (comments?.map((comment, idx) => {
+--                    return <Comment key={idx} data={comment} />
+--                }) ?? [])
+--            }
+--        </div>
+--    );
+--}
+--
+--// export default CommentPage;
+--
+--/* ==== File: src/TestRouterApp.js ==== */
+--import { BrowserRouter, Routes, Route } from "react-router-dom";
+--
+--import EventPage from "./pages/event/EventPage";
+--import SuccessPage from "./pages/event/SuccessPage";
+--import ErrorPage from "./pages/event/ErrorPage";
+--import ViewPage from "./pages/event/ViewPage";
+--const TestRouterApp = () => {
+--
+--    return (
+--        <BrowserRouter>
+--            <Routes>
+--                <Route path="/" element={<EventPage />} />
+--                <Route path="/success" element={<SuccessPage />} />
+--                <Route path="/error" element={<ErrorPage />} />
+--                // pathvarible
+--                <Route path="/read/:id" element={<ViewPage />} />
+--
+--            </Routes>
+--
+--        </BrowserRouter>
+--    )
+--}
+--
+--export default TestRouterApp;
+--
+--/* ==== File: src/components/rendering/Greeting.jsx ==== */
+--import GuestGreeting from "./GuestGreeting";
+--import UserGreeting from "./UserGreeting";
+--
+--const Greeting = (props) => {
+--    {
+--        return props.flag ? <UserGreeting /> : <GuestGreeting />
+--    }
+--}
+--
+--export default Greeting;
+--
+--/* ==== File: src/components/rendering/GuestGreeting.jsx ==== */
+--
+--const GuestGreeting = () => {
+--    return (
+--        <div>
+--            <h1>Guest님 로그인 후 사용부탁드립니다.</h1>
+--        </div>
+--    )
+--}
+--
+--export default GuestGreeting;
+--
+--/* ==== File: src/components/rendering/LoginButton.jsx ==== */
+--
+--
+--/* ==== File: src/components/rendering/LogoutButton.jsx ==== */
+--import Button from "../styled/Button"
+--
+--const LogoutButton = (props) => {
+--    const logoutHandler = (setFlag) => {
+--        setFlag(false);
+--    }
+--    return (
+--        <div>
+--            <Button title={`로그아웃`}
+--                onclick={() => logoutHandler(props.isLogin)}></Button>
+--        </div>
+--    )
+--}
+--
+--export default LogoutButton;
+--
+--/* ==== File: src/components/rendering/UserGreeting.jsx ==== */
+--
+--const UserGreeting = () => {
+--    return (
+--        <div>
+--            <h1>환영합니다.....{`000`}님</h1>
+--        </div>
+--    )
+--}
+--
+--export default UserGreeting;
+--
+--/* ==== File: src/pages/event/ErrorPage.jsx ==== */
+--import { Link } from "react-router-dom";
+--
+--// state가 아닌 QueryString으로 선발되는 형식일 경우
+--import { useSearchParams } from "react-router-dom";
+--
+--const ErrorPage = () => {
+--
+--    const [searchParams] = useSearchParams();
+--    const category = searchParams.get('category');
+--    const sort = searchParams.get('sort');
+--    return (
+--        <div>
+--            <center>로그인 실패({category}, {sort})</center>
+--            &nbsp;&nbsp;&nbsp;
+--            <Link to="/">랜딩페이지로...</Link>
+--        </div>
+--    );
+--}
+--
+--export default ErrorPage;
+--
+--/* ==== File: src/pages/event/EventPage.jsx ==== */
+--// import Button from 'react-bootstrap/Button';
+--import 'bootstrap/dist/css/bootstrap.min.css';
+--import { Button } from 'react-bootstrap';
+--import { useEffect, useState } from 'react';
+--import api from '../../api/axios';
+--import { useNavigate } from 'react-router-dom'
+--
+--const EventPage = () => {
+--
+--    /*
+--    변수란? 
+--    - scope : 전역, 지역
+--
+--    const data = {
+--        id : 'jslim', password : 'jslim'
+--
+--    }
+--    let id = data.id;
+--    let password = data.password;
+--    -> State 관리가 안되는 코드 
+--    -> UI 와 Script가 sync가 안맞는다.
+--    
+--    const [id, setId] = useState();
+--    const [password, setPassword] = useState();
+--
+--    setId(data.id);
+--    setPassword(data.password);
+--    -> 상태관리 UI와 Script가 sync가 맞는 코드
+--    */
+--
+--    const [email, setEmail] = useState('');
+--    const [pswd, setPswd] = useState('');
+--
+--    // 작성해주신 원래 방식대로 직접 꽂아 넣기
+--    const emailHandler = (e) => {
+--        setEmail(e.target.value);
+--        // console.log(`debug >>>> emailHandler email : `, email);
+--    }
+--
+--    const passwordHandler = (e) => {
+--        setPswd(e.target.value);
+--        // console.log(`debug >>>> passwordHandler password : `, pswd);
+--    }
+--
+--
+--    // transition 위한 Hook 
+--    const moveUrl = useNavigate();
+--    const signInHandler = async (e, email, pswd) => {
+--        console.log(`debug >>>> signInHandler email : `, email, `, pswd : `, pswd);
+--        e.preventDefault();
+--
+--        await api.get(`/users?email=${email}&pswd=${pswd}`)
+--            .then(response => {
+--                console.log(`debug >>>> response`, response)
+--
+--                const ary = response.data;
+--                if (ary.length > 0) {
+--
+--
+--                    const user = ary[0];
+--                    localStorage.setItem('userName', user.name);
+--                    //Router를 통해서 데이터를 전달
+--                    moveUrl('/success', {
+--                        state: {
+--                            user,
+--                            from: '/singIn'
+--                        }
+--                    })
+--                    // moveUrl(`/success?catagory=react&sort=latest`)
+--                } else {
+--                    moveUrl(`/error?category=react&sort=latest`);
+--                }
+--            })
+--            .catch(err => {
+--                console.log(`debug >>>> erorr : `, err);
+--            })
+--
+--    }
+--
+--    useEffect(() => {
+--        // console.log(`debug >>>> email : `, email);
+--        // console.log(`debug >>>> password : `, pswd);
+--    }, [email, pswd]);
+--
+--    return (
+--        // mt-4(상단 여백)와 max-width 스타일 추가로 중앙 레이아웃 정돈
+--        <div className='container mt-4' style={{ maxWidth: '600px' }}>
+--            <div className="mb-3 mt-3">
+--                <label htmlFor="email" className="form-label">Email:</label>
+--                <input type="email"
+--                    className="form-control"
+--                    id="email"
+--                    placeholder="Enter email"
+--                    name="email"
+--                    value={email}
+--                    onChange={(e) => emailHandler(e)} />
+--            </div>
+--            <div className="mb-3">
+--                <label htmlFor="pwd" className="form-label">Password:</label>
+--                <input type="password"
+--                    className="form-control"
+--                    id="pwd"
+--                    placeholder="Enter password"
+--                    name="pswd"
+--                    value={pswd}
+--                    onChange={(e) => passwordHandler(e)} />
+--            </div>
+--            <div className="form-check mb-3">
+--                <label className="form-check-label">
+--                    <input className="form-check-input"
+--                        type="checkbox"
+--                        name="remember" /> Remember me
+--                </label>
+--            </div>
+--            <Button variant='primary'
+--                onClick={(e) => signInHandler(e, email, pswd)}>SignIn</Button>
+--            {/* <button
+--                type="button"
+--                className="btn btn-primary"
+--                onClick={(e) => signInHandler(e, email, pswd)}
+--            >SignIp</button> */}
+--        </div>
+--    );
+--}
+--
+--export default EventPage;
+--
+--/* ==== File: src/pages/event/SuccessPage.jsx ==== */
+--import { Link } from "react-router-dom"
+--
+--// 데이터를 state 통해서 전달
+--import { useLocation } from "react-router-dom";
+--const SuccessPage = () => {
+--
+--    const location = useLocation();
+--    const { user, from } = location.state || {}
+--
+--    const name = localStorage.getItem('userName');
+--    return (
+--        <div>
+--            <center>{name}님로그인 성공</center>
+--            &nbsp;&nbsp;&nbsp;
+--            <Link to="/read/1">상세페이지로...</Link>
+--            &nbsp;&nbsp;&nbsp;
+--            <Link to="/">랜딩페이지로...</Link>
+--        </div>
+--    );
+--}
+--
+--export default SuccessPage;
+--
+--/* ==== File: src/pages/event/ViewPage.jsx ==== */
+--// pathVariable 형태의 데이터를 얻어올 때
+--import { useParams } from "react-router-dom";
+--
+--const ViewPage = () => {
+--    // pathVariable 가능 
+--    const { id } = useParams();
+--    console.log(`debug >>>> viewPage userParams id : ${id}`);
+--}
+--
+--export default ViewPage;
+--
+--/* ==== File: src/pages/rendering/RenderingPage.jsx ==== */
+--import { useState } from "react";
+--import Greeting from "../../components/rendering/Greeting";
+--import LogoutButton from "../../components/rendering/LogoutButton"
+--
+--const RenderingPage = () => {
+--    // Script 
+--    const [flag, setFlag] = useState(false);
+--
+--    // UI
+--
+--    return (
+--        <div>
+--            <Greeting flag={flag} />
+--            {
+--                flag ?
+--                    <LogoutButton isLogin={setFlag} />
+--                    :
+--                    ''
+--                // <LoginButton isLogin={setFlag} />
+--
+--            }
+--        </div>
+--    );
+--}
+--
+--export default RenderingPage;
+--
+
+
+===== src/features/forcast/item/ForcastItem.jsx =====
+
+
+
+===== src/features/forcast/list/ForcastList.jsx =====
+
+
+
+===== src/features/forcast/page/ForcastPage.jsx =====
+
+
+
+
+===== src/features/openapi/css/weather.css =====
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+/* box */
+.weather-box {
+    width: 300px;
+    padding: 20px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #74ebd5, #9face6);
+    color: #fff;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.weather-city {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.weather-temp {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.weather-desc {
+    font-size: 16px;
+    opacity: 0.9;
+}
+
+/* city name button style */
+.button-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.btn {
+    border-radius: 20px !important;
+    padding: 8px 16px !important;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: scale(1.1);
+}
+
+.btn.active {
+    background-color: #6c5ce7 !important;
+    color: white !important;
+}
+
+===== src/features/openapi/page/WeatherPage.jsx =====
+
+// import { useEffect, useState } from "react";
+// import '../css/weather.css'
+// import WeatherButton from "../ui/WeatherButton";
+// import WeatherBox from "../ui/WeatherBox"
+
+// const key = process.env.REACT_APP_WEATHER_API_KEY;
+
+// const WeatherPage = () => {
+
+//     const cities = ["Seoul, KR", "Busan, KR", "Daejeon, KR", "Incheon, KR", "Paris", "New York"];
+//     const [city, setCity] = useState('');
+//     const [weather, setWeather] = useState({});
+
+//     const cityHandler = (e, city) => {
+//         // city에 대한 변경을 담당하는 핸들러 
+//         console.log(`debug >>>> cityHandler city ${city}`);
+//         setCity(city);
+//     }
+
+
+//     ////////////////////////// 도시버튼 이벤트 발생 시
+//     // city update 호출되는 Effect 
+
+//     ///https://api.openweathermap.org/data/2.5/weather?q={city name}&appid={API key}
+
+
+
+//     useEffect(() => {
+//         console.log(`debug >>>> cityHandler city ${city}`);
+//         if (city != '') {
+//             getCityWeather();
+//         }
+//     }, [city])
+
+//     const getCityWeather = async () => {
+//         const endPoint = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${key}`
+//         let response = await fetch(endPoint);
+
+//         await fetch(endPoint)
+//             .then(response => {
+//                 console.log(`debug >>>> getCity fetch response`, response);
+//                 return response.json();
+//             })
+//             .then(data => {
+//                 console.log(`debug >>>> getCity fetch response data`, data);
+//                 setWeather(data)
+//             })
+//             .catch(error => {
+//                 console.log(`debug >>>> getCity fetch error`, error)
+//             })
+//     };
+
+
+//     ////////////////////////// 마운트 시 
+//     const getCurrentLocatio = () => {
+//         navigator.geolocation.getCurrentPosition((position) => {
+
+//             let lat = position.coords.latitude;
+//             let lon = position.coords.longitude;
+
+//             getCurrentWeather(lat, lon);
+//         });
+//     };
+
+//     /*
+//     Q)
+//     Fetch api - get(QueryString)
+//      endpoint - https://api.openweathermap.org/data/2.0/onecall/current?lat={lat}&lon={lon}&appid={API key}
+//      이거 사용 : endpoirt - https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API key}
+//      */
+//     const getCurrentWeather = async (lat, lon) => {
+//         console.log(`debug >>>> lat=${lat}, lon=${lon}`);
+//         const endPoint = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${key}`
+//         let response = await fetch(endPoint);
+
+//         await fetch(endPoint)
+//             .then(response => {
+//                 console.log(`debug >>>> fetch response`, response);
+//                 return response.json();
+//             })
+// //             .then(data => {
+//                  console.log(`debug >>>> fetch response data`, data);
+//                  if (data.main) {
+//                  // 섭씨로 가공
+//                  data.main.temp = (data.main.temp - 273.15).toFixed(1);
+// }
+//                  setWeather(data)
+//             })
+//             .catch(error => {
+//                 console.log(`debug >>>> fetch error`, error)
+//             })
+
+//     };
+
+
+//     useEffect(() => {
+//         getCurrentLocatio()
+//     }, [])
+
+//     // UI Template
+//     return (
+//         <div className="container">
+//             <WeatherBox weather={weather} />
+//             <WeatherButton
+//                 cities={cities}
+//                 city={city}
+//                 handler={cityHandler}
+//             />
+//         </div>
+//     );
+
+// }
+
+// export default WeatherPage;
+
+
+
+
+import { useEffect, useState } from "react";
+import '../css/weather.css'
+import WeatherButton from "../ui/WeatherButton";
+import WeatherBox from "../ui/WeatherBox"
+import KakaoMap from "../ui/KakaoMap"
+
+const key = process.env.REACT_APP_WEATHER_API_KEY;
+
+const WeatherPage = () => {
+    // [카카오지도용 한글명, OpenWeather용 영문명, 국가코드]
+    const cities = [
+        ["서울", "Seoul", "KR"],
+        ["부산", "Busan", "KR"],
+        ["대전", "Daejeon", "KR"],
+        ["인천", "Incheon", "KR"],
+        ["파리", "Paris", "FR"],
+        ["뉴욕", "New York", "US"]
+    ];
+    const [city, setCity] = useState('');
+    const [weather, setWeather] = useState({});
+
+    const cityHandler = (e, city) => {
+        const [krName, enName, country] = city;
+
+        // OpenWeather API용 ("Seoul, KR")
+        setCity(`${enName}, ${country}`);
+
+        // 카카오 지도 주소 검색용 ("서울")
+        getCoordsByCity(krName);
+    };
+
+
+    ////////////////////////// 도시버튼 이벤트 발생 시
+    // city update 호출되는 Effect 
+
+    ///https://api.openweathermap.org/data/2.5/weather?q={city name}&appid={API key}
+
+    useEffect(() => {
+        console.log(`debug >>>> cityHandler city ${city}`);
+        if (city != '') {
+            getCityWeather();
+        }
+    }, [city])
+
+    const getCityWeather = async () => {
+        let endPoint = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${key}`
+        let response = await fetch(endPoint);
+
+        await fetch(endPoint)
+            .then(response => {
+                console.log(`debug >>>> getCity fetch response`, response);
+                return response.json();
+            })
+            .then(data => {
+                console.log(`debug >>>> getCity fetch response data`, data);
+                if (data.main) {
+                    // 섭씨로 가공
+                    data.main.temp = (data.main.temp - 273.15).toFixed(1);
+                }
+                setWeather(data)
+            })
+            .catch(error => {
+                console.log(`debug >>>> getCity fetch error`, error)
+            })
+    };
+
+
+    ////////////////////////// 마운트 시 
+    const getCurrentLocatio = () => {
+        navigator.geolocation.getCurrentPosition((position) => {
+
+            let lat = position.coords.latitude;
+            let lon = position.coords.longitude;
+
+            getCurrentWeather(lat, lon);
+        });
+    };
+
+
+    useEffect(() => {
+        getCurrentLocatio()
+    }, [])
+
+
+    /*
+    Q)
+    Fetch api - get(QueryString)
+    endpoint - https://api.openweathermap.org/data/2.0/onecall/current?lat={lat}&lon={lon}&appid={API key}
+    이거 사용 : endpoirt - https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API key}
+     */
+    const getCurrentWeather = async (lat, lon) => {
+        console.log(`debug >>>> lat=${lat}, lon=${lon}`);
+        let endPoint = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${key}`
+        let response = await fetch(endPoint);
+
+        await fetch(endPoint)
+            .then(response => {
+                console.log(`debug >>>> fetch response`, response);
+                return response.json();
+            })
+            .then(data => {
+                console.log(`debug >>>> fetch response data`, data);
+                if (data.main) {
+                    data.main.temp = (data.main.temp - 273.15).toFixed(1);
+                }
+                setWeather(data)
+            })
+            .catch(error => {
+                console.log(`debug >>>> fetch error`, error)
+            })
+
+    };
+
+    ///// 도시 클릭 시 좌표 얻기 (kakao gecoder)
+    const [moveTo, setMoveTo] = useState(null);
+
+    const getWeatherByCoords = async (lat, lng) => {
+        console.log(`debug >>>> getWeatherByCoords lat, lon : ${lat}, ${lng} `);
+        let endPoint = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${key}`;
+        await fetch(endPoint)
+            .then(response => {
+                console.log(`debug >>>> fetch response `, response);
+                return response.json();
+            })
+            .then(data => {
+                console.log(`debug >>>> fetch response data `, data);
+                if (data.main) {
+                    data.main.temp = (data.main.temp - 273.15).toFixed(1);
+                }
+                setWeather(data);
+            })
+            .catch(error => {
+                console.log(`debug >>>> fetch error `, error);
+            });
+    };
+
+    // 좌표 변환 함수
+    const getCoordsByCity = (cityName) => {
+        const geocooder = new window.kakao.maps.services.Geocoder();
+        geocooder.addressSearch(cityName, (result, status) => {
+            if (status === window.kakao.maps.services.Status.OK) {
+                const lat = parseFloat(result[0].y)
+                const lng = parseFloat(result[0].x)
+                console.log(`debug >>>> city coords result `, result);
+                console.log(`debug >>>> city coords `, result[0].y, result[0].x)
+                setMoveTo({ lat: lat, lng: lng, time: Date.now() });
+                getWeatherByCoords(lat, lng);
+            }
+            else {
+                console.log(`debug city coords result : error ${status}`)
+            }
+        });
+    }
+
+    // UI Template
+    return (
+        <div className="container">
+            {/* kakao map version add : coords (좌표 -위도(lat) / 경도 lot) */}
+            <KakaoMap setWeatherByCoords={getWeatherByCoords}
+                moveTo={moveTo} />
+
+
+            {/* api.openweathermap.org  */}
+            <WeatherBox weather={weather} />
+            <WeatherButton
+                cities={cities}
+                city={city}
+                handler={cityHandler}
+            />
+        </div>
+    );
+
+}
+
+export default WeatherPage;
+
+===== src/features/openapi/ui/KakaoMap.jsx =====
+
+import { useEffect, useRef } from "react";
+
+const KakaoMap = ({ setWeatherByCoords, moveTo }) => {
+    const mapRef = useRef(null);
+    const markerRef = useRef(null);
+
+    // 지도를 띄우고 마커를 위치 시키는 일 
+    useEffect(() => {
+        window.kakao.maps.load(() => {
+            navigator.geolocation.getCurrentPosition((position) => {
+                let lat = position.coords.latitude;
+                let lng = position.coords.longitude;
+
+                const container = document.getElementById('map');
+
+                // 서울 시청을 위치 시킨다.
+                const centerPosition = new window.kakao.maps.LatLng(37.5665, 126.9780);
+                const map = new window.kakao.maps.Map(container, {
+                    center: centerPosition,
+                    level: 3
+                });
+                const marker = new window.kakao.maps.Marker({
+                    position: centerPosition
+                });
+                marker.setMap(map);
+
+                mapRef.current = map;
+                markerRef.current = marker;
+
+                window.kakao.maps.event.addListener(map, "click", function (mouseEvent) {
+                    const lat = mouseEvent.latLng.getLat();
+                    const lng = mouseEvent.latLng.getLng();
+
+                    marker.setPosition(new window.kakao.maps.LatLng(lat, lng));
+                    setWeatherByCoords(lat, lng);
+                });
+            })
+        });
+    }, [])
+
+    // 외부에서 좌표 들어오면 지도 이동
+    useEffect(() => {
+        if (!moveTo) return;
+        if (!mapRef.current || !markerRef.current) return;
+
+        const lat = parseFloat(moveTo.lat);
+        const lng = parseFloat(moveTo.lng);
+
+        const position = new window.kakao.maps.LatLng(lat, lng);
+
+        console.log("지도 이동:", lat, lng);
+
+        mapRef.current.setCenter(position);
+        markerRef.current.setPosition(position);
+    }, [moveTo]);
+    return (
+        <div id='map' style={{ width: '100%', height: '400px' }}>
+
+        </div>
+    );
+}
+
+export default KakaoMap;
+
+// export default KakaoMap;
+/* global kakao */
+// import { useEffect } from "react";
+
+// const KakaoMap = () => {
+//     useEffect(() => {
+//         // window 객체 및 kakao SDK 로드 여부 확인
+//         if (window.kakao && window.kakao.maps) {
+//             window.kakao.maps.load(() => {
+//                 navigator.geolocation.getCurrentPosition((position) => {
+//                     let lat = position.coords.latitude;
+//                     let lon = position.coords.longitude;
+
+//                     const container = document.getElementById('map');
+//                     const options = {
+//                         center: new window.kakao.maps.LatLng(lat, lon),
+//                         level: 3,
+//                     };
+
+//                     const map = new window.kakao.maps.Map(container, options);
+//                 });
+//             });
+//         }
+//     }, []); // 빈 배열 필수
+
+//     return (
+//         /* height 오타 꼭 확인 */
+//         <div id='map' style={{ width: '100%', height: '400px', marginBottom: '20px' }}></div>
+//     );
+// };
+
+// export default KakaoMap;
+
+===== src/features/openapi/ui/WeatherBox.jsx =====
+
+import '../css//weather.css'
+
+/*
+    Q)
+    props로 전달되는 weather 는 openweather 서버와 통신을 통한 해당 도시의 날씨정보
+
+    weather - 현재 위치, 섭씨(C), , 날씨 요약정보 
+    섭씨(C) : (kelven - 273.15).toFixed(1)
+
+*/
+const WeatherBox = ({ weather }) => {
+
+    // tempC 계산 부분 page에서 처리하도록 나중에 수정하자!
+
+    return (
+        <div className='weather-box'>
+            <div className='weather-city'>
+                {weather?.name}
+            </div>
+            <div className='weather-temp'>
+                {weather?.main?.temp ? `${weather.main.temp}°C` : ''}
+            </div>
+            <div className='weather-desc'>
+                {weather?.weather?.[0]?.description}
+            </div>
+        </div>
+    );
+}
+
+export default WeatherBox;
+
+===== src/features/openapi/ui/WeatherButton.jsx =====
+
+import { Button } from 'react-bootstrap';
+
+const WeatherButton = ({ cities, city, handler }) => {
+    return (
+        <div className="button-group">
+            {cities && cities.map((item, idx) => {
+                return (
+                    <Button
+                        key={idx}
+                        className={`btn ${city === item ? 'active' : ''}`}
+                        onClick={(e) => handler(e, item)}
+                    >
+                        {item[0]}
+                    </Button>
+                );
+            })}
+        </div>
+    );
+};
+
+export default WeatherButton;
