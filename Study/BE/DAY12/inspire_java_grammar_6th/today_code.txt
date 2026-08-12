@@ -1,0 +1,266 @@
+﻿
+===== C:\Inspire_6th\Study\BE\inspire_java_grammar_6th\src\App.java =====
+
+public class App {
+    public static void main(String[] args) throws Exception {
+        System.out.println("Hello, World!");
+    }
+}
+
+===== C:\Inspire_6th\Study\BE\inspire_java_grammar_6th\src\BlogApp.java =====
+
+import features.blogs.domain.dto.BlogRequestDTO;
+
+public class BlogApp {
+    public static void main(String[] args) {
+        // System.out.println(">>>> new ?곗궛?먮? ?댁슜??媛앹껜?앹꽦");
+        // // BlogRequestDTO request = new BlogRequestDTO(1, "title", "content",
+        // "email");
+
+        System.out.println();
+        System.out.println();
+
+        BlogRequestDTO request = BlogRequestDTO.builder()
+                .id(1)
+                .title("title")
+                .content("content")
+                .email("email")
+                .build();
+
+        System.out.println("title : " + request.getTitle());
+        ;
+    }
+}
+
+===== C:\Inspire_6th\Study\BE\inspire_java_grammar_6th\src\CarApp.java =====
+
+import features.car.Car;
+
+public class CarApp {
+
+    public static void main(String[] args) {
+        Car audi = new Car();
+        audi.setBrand("?꾩슦??);
+        System.out.println("brand : " + audi.getBrand());
+
+        //// ?앹꽦???쒖슜
+        Car bmw = new Car("BMW");
+        System.out.println("brand : " + bmw.getBrand());
+
+        System.out.println();
+        Car benz = new Car("BENZ", "C200");
+        System.out.println("brand: " + benz.getBrand());
+        System.out.println("model : " + benz.getModel());
+
+        benz.carInfo();
+    }
+}
+
+===== C:\Inspire_6th\Study\BE\inspire_java_grammar_6th\src\TeacherApp.java =====
+
+import features.var.Teacher;
+
+public class TeacherApp {
+    public static void main(String[] args) {
+        // new ?곗궛?먮? ?댁슜?섏뿬 instance瑜??앹꽦?????덉쓬
+        Teacher teacher = new Teacher();
+        System.err.println("teacher - " + teacher);
+
+        teacher.setName("?꾩젙??);
+        String name = teacher.getName();
+        System.out.println(name);
+
+        String name2 = teacher.name = "inspire";
+        System.out.println(name2);
+        ;
+
+    }
+}
+
+===== C:\Inspire_6th\Study\BE\inspire_java_grammar_6th\src\VariableApp.java =====
+
+public class VariableApp {
+
+    /*
+     * 蹂?? ?곗씠?곕? ?대뒗 洹몃쫯
+     * - 湲곕낯???(媛믪쓣 ?대뒗 洹몃쫯) <-literal value
+     * - ?レ옄??(?뺤닔 - byte, short, int, log, ?ㅼ닔 - float, double)
+     * - 臾몄옄??(char)
+     * - ?쇰━??(boolean)
+     * - 臾몄옄??(String) - 媛앹껜??class)
+     * - 李몄“???(二쇱냼媛믪쓣 ?대뒗 洹몃쫯)
+     * - 湲곕낯??낆씠 ?꾨땶 紐⑤뱺 寃?
+     * 
+     * ?좎뼵臾몃쾿
+     * - ?묎렐吏?뺤옄 蹂?섑???蹂?섎챸 = literal value;
+     * 
+     * ?꾩튂???곕Ⅸ 蹂??Scope
+     * - ?대옒??釉붾줉???좎뼵 - 硫ㅻ쾭蹂??
+     * - 硫붿꽌??釉붾줉???좎뼵 - 吏?????
+     * 
+     */
+    public static void main(String[] args) {
+        String name = "?꾩젙??;
+        int age = 20;
+        double height = 178.0;
+        char gender = 'm';
+        boolean isMarriage = true;
+
+        System.out.println("name \t " + name);
+        System.out.println("age \t " + age);
+        System.out.println("height \t " + height);
+        System.out.println("gender \t " + gender);
+        System.out.println("isMarriage \t " + isMarriage);
+
+        // Wrapper Class - Boxing, UnBoxing
+        // primitive type reference type
+
+        Integer ii = 10;
+        System.out.println(10 + ii);
+
+        // casting(?レ옄)
+        /*
+         * byte -> short -> int -> long -> float -> double ->
+         * char -> int
+         * (byte)integer
+         */
+        byte x = 10, y = 10, sum = 0;
+        sum = (byte) (x + y);
+        System.out.println(sum);
+    }
+
+}
+
+===== C:\Inspire_6th\Study\BE\inspire_java_grammar_6th\src\features\blogs\domain\dto\BlogRequestDTO.java =====
+
+package features.blogs.domain.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Builder
+@NoArgsConstructor // default Cnstructor
+@AllArgsConstructor
+@Setter
+@Getter
+public class BlogRequestDTO {
+    private int id;
+    private String title;
+    private String content;
+    private String email;
+
+}
+
+===== C:\Inspire_6th\Study\BE\inspire_java_grammar_6th\src\features\car\Car.java =====
+
+package features.car;
+
+public class Car {
+    private String brand;
+    private String model;
+
+    public Car() {
+        this.brand = "?꾩슦??;
+    }
+
+    public Car(String brand) {
+        this.brand = brand;
+    }
+
+    public Car(String brand, String model) {
+        this.brand = brand;
+        this.model = model;
+    }
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public String carInfo() {
+        return brand + "釉뚮옖?쒖쓽 紐⑤뜽? : " + model;
+    }
+    // public String brand;
+    // public String model;
+
+    // public Car() {
+
+    // }
+
+    // /*
+    // * constructro(?앹꽦??
+    // * - 諛섑솚??낆씠 void ?꾨땲怨??녿떎.
+    // * - 硫붿꽌?쒖쓽 ?대쫫???대옒?ㅼ쓽 ?대쫫怨??숈씪?섎떎.
+    // * - ?몄뒪?댁뒪 ?뚯쑀媛 ?꾨땲誘濡?
+    // * - ?쇰컲 硫붿꽌?쒖쿂???몄텧?섏뼱吏????녿떎.
+    // * - 諛섎뱶??new ?곗궛???ㅼ뿉?쒕쭔 ?몄텧?섏뼱????
+    // */
+    // public Car(String brand) {
+    // this.brand = brand;
+    // }
+
+    // public Car(String brand, String model) {
+    // this.brand = brand;
+    // this.model = model;
+    // }
+
+}
+
+===== C:\Inspire_6th\Study\BE\inspire_java_grammar_6th\src\features\var\Teacher.java =====
+
+package features.var;
+
+public class Teacher {
+    // ?좎뼵 ?꾩튂媛 ?대옒??釉붾윮?쇰줈 硫ㅻ쾭 蹂??
+    public String name;
+    public int age;
+    public char gender;
+    public String job;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public char getGender() {
+        return gender;
+    }
+
+    public void setGender(char gender) {
+        this.gender = gender;
+    }
+
+    public String getJob() {
+        return job;
+    }
+
+    public void setJob(String job) {
+        this.job = job;
+    }
+
+}
