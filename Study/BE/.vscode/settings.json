@@ -2,6 +2,7 @@
     "java.project.referencedLibraries": [
         "lib/**/*.jar",
         "DAY12/inspire_java_grammar_6th/lib/lombok.jar",
-        "DAY12~13/inspire_java_grammar_6th/lib/lombok.jar"
+        "DAY12~13/inspire_java_grammar_6th/lib/lombok.jar",
+        "DAY12~14/inspire_java_grammar_6th/lib/lombok.jar"
     ]
 }
