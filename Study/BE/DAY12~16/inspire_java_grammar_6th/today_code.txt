@@ -1,0 +1,361 @@
+﻿===== C:\Inspire_6th\Study\BE\DAY12~15\inspire_java_grammar_6th\src\features\generics\ResponseTemplate.java =====
+package features.generics;
+
+public class ResponseTemplate<T> {
+
+    private int code;
+    private String message;
+    private T data;
+
+    public int getCode() {
+        return code;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public T getData() {
+        return data;
+    }
+
+    public void setData(T data) {
+        this.data = data;
+    }
+
+    public ResponseTemplate() {
+
+    }
+
+    public ResponseTemplate(int code, String message, T data) {
+        this.code = code;
+        this.message = message;
+        this.data = data;
+    }
+}
+===== C:\Inspire_6th\Study\BE\DAY12~15\inspire_java_grammar_6th\src\features\lambda\InspireFunction.java =====
+package features.lambda;
+
+/*
+ 함수형 인터페이스 
+  인터페이스가 가질 수 있는 메서드가 딱 하나인 것을 의미
+  람다식을 활용하기 위해서 
+
+  Supliper : 매개변수 x, 반환타입 o
+  Consumer : 매개변수 o, 반환타입 x
+  Function : 매개변수 o, 반환타입 o
+  Predicate : 매개변수 o, 반환타입으로 boolean
+
+*/
+
+@FunctionalInterface
+public interface InspireFunction {
+    public int max(int x, int y);
+
+}
+===== C:\Inspire_6th\Study\BE\DAY12~15\inspire_java_grammar_6th\src\features\oop\sub\StudentDTO.java =====
+package features.oop.sub;
+
+import features.oop.sup.PersonDTO;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
+
+@SuperBuilder
+@Getter
+@ToString(callSuper = true)
+@NoArgsConstructor
+@AllArgsConstructor
+
+public class StudentDTO extends PersonDTO {
+
+    private String ssn;
+
+    // public StudentDTO() {
+
+    // }
+
+    public StudentDTO(String name, int age, String address, String ssn) {
+        super(name, age, address);
+        System.out.println("StudentDTO 출력");
+        this.ssn = ssn;
+    }
+
+    // public String getSsn() {
+    // return ssn;
+    // }
+
+    // public void setSsn(String ssn) {
+    // this.ssn = ssn;
+    // }
+
+    @Override
+    public String personInfo() {
+        return super.personInfo() + "," + " ssn = " + ssn;
+    }
+
+}
+===== C:\Inspire_6th\Study\BE\DAY12~15\inspire_java_grammar_6th\src\CollectionApp.java =====
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import features.oop.sub.ManagerDTO;
+import features.oop.sub.StudentDTO;
+import features.oop.sub.TeacherDTO;
+import features.oop.sup.PersonDTO;
+
+public class CollectionApp {
+
+    /*
+     * Collection API (- Java.util.*)
+     * - list (중복허용, 순선존재, 요소의 타입으로 객체만, 가변길이)
+     * - Set (중복허용 x, 순서존재 x, 요소의 타입으로 객체만, 가변길이)
+     * - 순서가 없으므로 for() 불가능
+     * - Map ( {key : value}, {key:value}, .... )
+     * 
+     * (Consumer <? super E> action) -> 함수형 메서드
+     * 메서드가 함수를 인자로 받음
+     * 
+     * element : 타입의 안정성읃 얻음
+     */
+
+    public static void main(String[] args) {
+        List<String> list = new ArrayList<String>();
+
+        list.add("String");
+        // list.add(10);
+        // list.add(true);
+
+        System.out.println("debug >>>> " + list);
+
+        System.out.println();
+        System.out.println("debug >>>> ArrayList Element xxxxDTO ");
+
+        List<PersonDTO> personList = new ArrayList<PersonDTO>();
+        StudentDTO student = StudentDTO.builder()
+                .name("inspire").build();
+        TeacherDTO teacher = TeacherDTO.builder()
+                .name("jslim").build();
+        ManagerDTO manager = ManagerDTO.builder()
+                .name("lgcns").build();
+
+        personList.add(student);
+        personList.add(teacher);
+        personList.add(manager);
+
+        List<String> filteringList = new ArrayList<String>();
+        for (int idx = 0; idx < personList.size(); idx++) {
+            PersonDTO person = personList.get(idx);
+            if (person.getName().startsWith("j")) {
+                filteringList.add(person.getName().toUpperCase());
+            }
+        }
+
+        // Stream API (선언적 처리)
+        // 컬렉션을 Stream 객체로 바인딩하고 - 중간 연산(0~N) - 연산결과를 최종연산(1)
+        // System::println
+        // s -> s.startsWith()
+
+        List<String> filteringList2 = personList.stream()
+                .filter(s -> s.getName().startsWith("j"))
+                .map(s -> s.getName().toUpperCase())
+                .collect(Collectors.toList());
+        System.out.println(filteringList2);
+
+        personList.stream()
+                .filter(person -> person.getName().length() > 5)
+                .forEach(System.out::println);
+
+        // 중복 data 는 skip 즉, 담는것에 의의를 둠
+        System.out.println();
+        System.out.println("debug >>>> Set");
+        Set<String> set = new HashSet<>();
+        set.add("jslim");
+        set.add("inspire");
+        set.add("lgcns");
+        set.add("jslim");
+
+        System.out.println(set);
+        Object[] setAry = set.toArray();
+        for (Object data : setAry) {
+            System.out.println(data);
+        }
+
+        System.out.println();
+        System.out.println("debug >>>> Map (key : value) === JSON");
+
+        List<StudentDTO> studentList = new ArrayList<StudentDTO>();
+        List<TeacherDTO> teacherList = new ArrayList<TeacherDTO>();
+        List<ManagerDTO> managerList = new ArrayList<ManagerDTO>();
+
+        Map<String, List<? extends PersonDTO>> map = new HashMap<>();
+        map.put("student", studentList);
+        map.put("teacher", teacherList);
+        map.put("manager", managerList);
+
+        // List<? extends PersonDTO> mapList = map.get("manager");
+        // mapList.forEach(person -> System.out.println(person.personInfo()));
+        // -> stream 방식
+        map.get("stduent")
+                .stream()
+                .filter(null)
+                .map(null)
+                .forEach(person -> System.out.println(person.personInfo()));
+
+    }
+}
+===== C:\Inspire_6th\Study\BE\DAY12~15\inspire_java_grammar_6th\src\GenericsApp.java =====
+import java.util.ArrayList;
+import java.util.List;
+
+import features.generics.ResponseTemplate;
+import java.util.stream.Collectors;
+
+import features.oop.sub.ManagerDTO;
+import features.oop.sub.StudentDTO;
+import features.oop.sub.TeacherDTO;
+import features.oop.sup.PersonDTO;
+
+public class GenericsApp {
+
+    public static void main(String[] args) {
+        System.out.println();
+        System.out.println("debug >>>> Generics App");
+
+        // ResponseTemplate<Integer> errCode = new ResponseTemplate<>();
+        // errCode.setCode(200);
+        // System.out.println("code : " + errCode.getCode());
+
+        // System.out.println();
+        // ResponseTemplate<String> errMessage = new ResponseTemplate<>();
+        // errMessage.setCode("리소스 생성완료");
+        // System.out.println("message : " + errMessage.getCode());
+
+        // generic wildcard : extends vs super
+        // 메서드의 매개변수 타입선언 및 리턴타입 지정할 때 자주 사용되는 문법
+        // extends : 읽기전용 (T 하위타입)
+        // super : 쓰기전용 (T 상위 타입)
+
+        List<PersonDTO> personList = new ArrayList<PersonDTO>();
+        StudentDTO student = StudentDTO.builder()
+                .name("inspire").build();
+        TeacherDTO teacher = TeacherDTO.builder()
+                .name("jslim").build();
+        ManagerDTO manager = ManagerDTO.builder()
+                .name("lgcns").build();
+
+        personList.add(student);
+        personList.add(teacher);
+        personList.add(manager);
+
+        ResponseTemplate<List> response = new ResponseTemplate<List>(200, "OK", personList);
+
+        List<PersonDTO> lst = response.getData();
+
+        for (int idx = 0; idx < lst.size(); idx++) {
+            PersonDTO person = lst.get(idx);
+            System.out.println(((PersonDTO) person).personInfo());
+        }
+    }
+}
+===== C:\Inspire_6th\Study\BE\DAY12~15\inspire_java_grammar_6th\src\StreamApp.java =====
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+
+import features.lambda.InspireFunction;
+
+/*
+ - java Stream API
+ - 코드의 가독성, 병렬처리, 유지보수 향상
+ - 작업을 내부적으로 처리(람다식)
+ - 원본데이터의(Collection) 손상을 가하지 않음.
+ - 일회성 
+*/
+public class StreamApp {
+    public static void main(String[] args) {
+        InspireFunction func01 = (x, y) -> x > y ? x : y;
+        System.out.println(func01.max(100, 200));
+
+        System.out.println();
+        InspireFunction func02 = (x, y) -> x + y;
+        System.out.println(func02.max(100, 200));
+
+        System.out.println();
+        System.out.println();
+
+        System.out.println("debug >>>> supplier ");
+        Supplier<String> supplier = () -> "inspire";
+        System.out.println(supplier.get());
+
+        System.out.println();
+        System.out.println("debug >>>> consumer ");
+        Consumer<String> consumer = (str) -> System.out.println(str.split(" ")[0]);
+        consumer
+                .accept("lgcns inspire");
+
+        System.out.println();
+        System.out.println("debug >>>> Function");
+        Function<String, Integer> function = (str) -> {
+            return str.length();
+        };
+        Integer len = function.apply("lgcns inspire 6th camp(feat. jslim");
+        System.out.println(len);
+
+        System.out.println();
+        System.out.println("debug >>>> predicate ");
+        Predicate<String> predicate = (str) -> str.equals("lgcns");
+        Boolean isFlag = predicate.test("inspire");
+        System.out.println(isFlag);
+
+        System.out.println();
+        System.out.println("debug >>>> forEach");
+        List<String> brands = Arrays.asList("samsung", "lg", "lgcns", "inspire", "camp", "6th");
+
+        // brands.forEach((brand) -> System.out.println(brand));
+
+        // brands.forEach(System.out::println);
+        brands.forEach((brand) -> {
+            System.out.println(brand);
+        });
+
+        System.out.println();
+        System.out.println("debug >>>> Collection -> Stream");
+        Stream<String> stream = brands.stream();
+
+        /*
+         * - Stream을 사용하는 목적
+         * - 가공과 연산이 되어야한다.
+         * - threed 연산
+         * - 스트림은 일회성이다.
+         */
+        stream.forEach((brand) -> {
+            System.out.println(brand);
+        });
+
+        System.out.println("debug >>>> 메서드 참조방식 (type::메서드명)");
+        stream = brands.stream();
+        stream.forEach(System.out::println);
+
+    }
+}
