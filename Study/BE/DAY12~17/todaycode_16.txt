@@ -1,0 +1,516 @@
+﻿
+// === File: C:\Inspire_6th\Study\BE\DAY12~16\.vscode\settings.json ===
+{
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "inspire_java_grammar_6th/lib/lombok.jar"
+    ]
+}
+
+// === File: C:\Inspire_6th\Study\BE\DAY12~16\inspire_java_grammar_6th\src\features\blogs\controller\ListController.java ===
+package features.blogs.controller;
+
+import java.util.List;
+
+import features.blogs.domain.dto.BlogResponseDTO;
+import features.blogs.service.BlogReactService;
+
+public class ListController {
+
+    private BlogReactService service;
+
+    public ListController() {
+
+    }
+
+    public ListController(BlogReactService service) {
+        this.service = service;
+    }
+
+    // view 에게 응답하는 역할의 메서드
+    public List<BlogResponseDTO> list() {
+        System.out.println("debug >>>> list controller list() ");
+        return service.list();
+    }
+
+}
+
+
+// === File: C:\Inspire_6th\Study\BE\DAY12~16\inspire_java_grammar_6th\src\features\blogs\domain\dto\BlogResponseDTO.java ===
+package features.blogs.domain.dto;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.AllArgsConstructor;
+
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Getter
+@ToString
+public class BlogResponseDTO {
+
+    private int status;
+    private String message;
+
+    /////////////////////////
+    private Integer blogId;
+    private String title, content, email;
+    private Integer viewCnt;
+
+}
+
+
+// === File: C:\Inspire_6th\Study\BE\DAY12~16\inspire_java_grammar_6th\src\features\blogs\facade\BlogFrontController.java ===
+package features.blogs.facade;
+
+import java.util.List;
+
+import features.blogs.controller.ListController;
+import features.blogs.domain.dto.BlogResponseDTO;
+import features.blogs.factory.BlogBeanFactory;
+
+public class BlogFrontController {
+
+    private BlogBeanFactory factory;
+
+    public BlogFrontController() {
+        // signleton pattern 사용
+        factory = BlogBeanFactory.getInstance();
+    }
+
+    public List<BlogResponseDTO> list(String endPoint) {
+        System.out.println("debug >>>> front contorller endPoint : " + endPoint);
+        Object controller = factory.getBean(endPoint);
+
+        return ((ListController) controller).list();
+    }
+}
+
+
+// === File: C:\Inspire_6th\Study\BE\DAY12~16\inspire_java_grammar_6th\src\features\blogs\factory\BlogBeanFactory.java ===
+package features.blogs.factory;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import features.blogs.controller.ListController;
+import features.blogs.repository.BlogReactDao;
+import features.blogs.service.BlogReactService;
+import features.blogs.service.BlogReactServiceImpl;
+
+/* 
+ - singleton pattern
+ - factory pattern
+ 사용자의 요청 endPoint로 각 controller 객체를 바인딩해서 담을 것 : Map 
+*/
+public class BlogBeanFactory {
+    // Object를 사용하는 이유 Controller들은 다양한 type이
+    // 나오기때문에 다향성을 지켜주는거임
+
+    // Bean = FrameWork를 통해서 생성되고 관리되는 것
+    private Map<String, Object> map;
+    private static BlogBeanFactory instance;
+
+    // dependency injection
+    private BlogReactService service;
+    private BlogReactDao dao;
+
+    private BlogBeanFactory() {
+        map = new HashMap<>();
+
+        dao = new BlogReactDao();
+        service = new BlogReactServiceImpl(dao);
+        // 추후 추가되는 각 기능을 구현하는 xxxController 등록
+        map.put("list.inspire", new ListController(service));
+    }
+
+    public static BlogBeanFactory getInstance() {
+        /*
+         * [싱글톤을 사용하는 이유]
+         * - 싱글톤을 쓰지 않으면 매 요청마다 Controller, Service, DAO 같은 로직 처리 객체가 계속 new 생성됨.
+         * - 손님이 올 때마다 '은행 금고문/창구'를 매번 새로 짓고 부수는 격(메모리 낭비 & GC 부하 발생).
+         * - 상태(State)를 가지지 않는 처리 객체는 1개만 생성해두고 여러 요청 스레드가 공유/재사용하는 것이 효율적임.
+         */
+        if (instance == null) {
+            instance = new BlogBeanFactory();
+        }
+        return instance;
+    }
+
+    // front controller가 호출하는 메서드
+    public Object getBean(String endPoint) {
+        return map.get(endPoint);
+    }
+
+}
+
+
+// === File: C:\Inspire_6th\Study\BE\DAY12~16\inspire_java_grammar_6th\src\features\blogs\repository\BlogReactDao.java ===
+package features.blogs.repository;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import features.blogs.domain.dto.BlogResponseDTO;
+
+public class BlogReactDao {
+    private List<BlogResponseDTO>
+
+    blogs = new ArrayList<>(List.of(
+            BlogResponseDTO.builder()
+                    .blogId(1)
+                    .title("react")
+                    .content("state")
+                    .email("lim")
+                    .viewCnt(10)
+                    .build(),
+            BlogResponseDTO.builder()
+                    .blogId(2)
+                    .title("java")
+                    .content("oop")
+                    .email("kim")
+                    .viewCnt(20)
+                    .build(),
+            BlogResponseDTO.builder()
+                    .blogId(3)
+                    .title("spring")
+                    .content("mybatis")
+                    .email("lee")
+                    .viewCnt(30)
+                    .build(),
+            BlogResponseDTO.builder()
+                    .blogId(4)
+                    .title("docker")
+                    .content("devops")
+                    .email("park")
+                    .viewCnt(40)
+                    .build(),
+            BlogResponseDTO.builder()
+                    .blogId(5)
+                    .title("msa")
+                    .content("kafka")
+                    .email("lim")
+                    .viewCnt(50)
+                    .build()));
+    // constructor block end
+
+    public List<BlogResponseDTO> findByAll() {
+        System.out.println("debug >>>> blog dao findByAll()");
+
+        return blogs;
+    }
+}
+
+
+// === File: C:\Inspire_6th\Study\BE\DAY12~16\inspire_java_grammar_6th\src\features\blogs\service\BlogReactService.java ===
+package features.blogs.service;
+
+import java.util.List;
+
+import features.blogs.domain.dto.BlogRequestDTO;
+import features.blogs.domain.dto.BlogResponseDTO;
+
+public interface BlogReactService {
+
+    public List<BlogResponseDTO> list();
+
+    public BlogResponseDTO read(int blogId);
+
+    // CURD : insert, update, delete
+    public int insert(BlogRequestDTO request);
+
+    public int update(BlogRequestDTO request);
+
+    public int delete(int blogId);
+
+    public List<BlogResponseDTO> search(BlogRequestDTO request);
+
+}
+
+
+// === File: C:\Inspire_6th\Study\BE\DAY12~16\inspire_java_grammar_6th\src\features\blogs\service\BlogReactServiceImpl.java ===
+package features.blogs.service;
+
+import java.util.List;
+
+import features.blogs.domain.dto.BlogRequestDTO;
+import features.blogs.domain.dto.BlogResponseDTO;
+import features.blogs.repository.BlogReactDao;
+
+public class BlogReactServiceImpl implements BlogReactService {
+
+    private BlogReactDao dao;
+
+    public BlogReactServiceImpl() {
+
+    }
+
+    public BlogReactServiceImpl(BlogReactDao dao) {
+        this.dao = dao;
+    }
+
+    @Override
+    public List<BlogResponseDTO> list() {
+        System.out.println("debug >>>> blog service list");
+        return dao.findByAll();
+    }
+
+    @Override
+    public BlogResponseDTO read(int blogId) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'read'");
+    }
+
+    @Override
+    public int insert(BlogRequestDTO request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'insert'");
+    }
+
+    @Override
+    public int update(BlogRequestDTO request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    }
+
+    @Override
+    public int delete(int blogId) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+    }
+
+    @Override
+    public List<BlogResponseDTO> search(BlogRequestDTO request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'search'");
+    }
+
+}
+
+
+// === File: C:\Inspire_6th\Study\BE\DAY12~16\inspire_java_grammar_6th\src\features\blogs\view\BlogReactView.java ===
+package features.blogs.view;
+
+import java.util.List;
+import java.util.Scanner;
+
+import features.blogs.domain.dto.BlogResponseDTO;
+import features.blogs.facade.BlogFrontController;
+
+public class BlogReactView {
+    /*
+     * - Scanner 데이터 입력
+     * - 예외처리
+     */
+
+    private Scanner scan;
+    private BlogFrontController front;
+
+    public BlogReactView() {
+        scan = new Scanner(System.in);
+        front = new BlogFrontController();
+    }
+
+    public void landingPage() {
+        while (true) {
+            System.out.println();
+            System.out.println(">>>> Inspire Camp Blog ver(1.0) <<<<");
+            System.out.println("1. 전체검색");
+            System.out.println("2. 게시글 상세보기");
+            System.out.println("3. 입력화면");
+            System.out.println("4. 수정화면");
+            System.out.println("5. 게시글 삭제");
+            System.out.println("6. 검색");
+            System.out.println("99. 프로그램 종료");
+
+            /*
+             * Q)
+             * - 사용자로부터 문자열 정수가 아닌 문자열이 입력된다면 예외 발생!!!
+             * - 예외처리를 통해서 메시지를 출력하고 다시 입력받을 수 있도록 흐름을 제어한다면
+             */
+
+            try {
+                System.out.print("원하시는 메뉴 번호를 입력하세요 : ");
+                int numner = Integer.parseInt(scan.nextLine());
+                switch (numner) {
+                    case 1:
+                        list();
+                        break;
+                    case 2:
+                    case 99:
+                        exit();
+                        break;
+                    default:
+                        break;
+                }
+            } catch (Exception e) {
+                System.out.println(">>>> ERROR) 입력 조건을 맞춰주세요. <<<<");
+            }
+
+        }
+    }
+
+    public void exit() {
+        System.out.println();
+        System.out.println(">>>> 시스템을 종료하겠습니다.");
+        System.exit(1);
+    }
+
+    public void list() {
+        System.out.println();
+        System.out.println(">>>> 데이터 출력");
+        String endPoint = "list.inspire";
+        List<BlogResponseDTO> response = front.list(endPoint);
+
+        // stream api 출력 == json rendering (react)
+
+        response.stream()
+                .forEach(System.out::println);
+    }
+
+}
+
+
+// === File: C:\Inspire_6th\Study\BE\DAY12~16\inspire_java_grammar_6th\src\features\exception\ExceptionDemo.java ===
+package features.exception;
+
+import features.util.InspireException;
+
+/*
+ Error : 논리적인 오류, etc...
+ Exception : mild Error
+ 예외(예기치 못한 상황) 처리방법
+
+ 예외발생 시점
+    - compile(IOException)`
+    - runtime(RuntimeException)
+
+예외처리 방법
+ case 1
+try {
+    예외코드
+} catch(발생된 예약객체를 정의) {
+    예외를 처리하고 예외발생시 수행하는 블럭 
+} finally {
+    예약발생여부와 상관없이 무조건 수행되는 블럭
+}
+ 
+ case 2
+public void xxxxx() throws xxxxException {
+    예외코드
+}
+
+- case 2인 throws 방식은 권장하지 않음
+
+- 사용자 정의 예외 클래스
+public class xxxx extend Exception {
+
+}
+
+- 강제로 예외를 발생시키는 상황
+throw new xxxxx Excption 
+
+*/
+public class ExceptionDemo {
+
+    public void first(int x) throws InspireException {
+
+        System.out.println("debug >>>> first method start");
+
+        try {
+            if (x < 0) {
+                throw new InspireException("양의 정수만 가능합니다!!");
+            }
+        } finally {
+            System.out.println("debug >>>> first method end");
+
+        }
+
+    }
+}
+
+
+// === File: C:\Inspire_6th\Study\BE\DAY12~16\inspire_java_grammar_6th\src\features\util\InspireException.java ===
+package features.util;
+
+public class InspireException extends Exception {
+
+    public InspireException() {
+
+    }
+
+    public InspireException(String msg) {
+        super(msg);
+    }
+}
+
+
+// === File: C:\Inspire_6th\Study\BE\DAY12~16\inspire_java_grammar_6th\src\BlogReactApp.java ===
+import features.blogs.view.BlogReactView;
+
+public class BlogReactApp {
+    public static void main(String[] args) {
+        BlogReactView view = new BlogReactView();
+        view.landingPage();
+    }
+}
+
+
+// === File: C:\Inspire_6th\Study\BE\DAY12~16\inspire_java_grammar_6th\src\ExceptionApp.java ===
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import features.exception.ExceptionDemo;
+import features.util.InspireException;
+
+public class ExceptionApp {
+    public static void main(String[] args) {
+        System.out.println("debug >>>> main start");
+
+        // System.out.println("debug >>>> runtime excption ~ ");
+        // String[] strAry = { "jslim", "inspire", "lgcns" };
+
+        // try {
+        // for (int idx = 0; idx <= strAry.length; idx++) {
+        // System.out.println(strAry[idx]);
+        // }
+        // } catch (ArrayIndexOutOfBoundsException e) {
+        // e.printStackTrace();
+        // } finally {
+        // System.out.println("debug >>>> 예외발생 여부와 상관 없이 수행");
+        // }
+
+        // System.out.println("debug >>>> compile exception");
+
+        // // input stream : 데이터가 입력되는 통로
+        // BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        // String line = null;
+        // try {
+        // System.out.print("메시지를 입력하세요 : ");
+        // line = br.readLine();
+        // } catch (IOException e) {
+        // e.printStackTrace();
+        // } finally {
+        // System.out.println(line);
+        // }
+
+        System.out.println("debug >>>> user exception end throws ");
+
+        ExceptionDemo demo = new ExceptionDemo();
+
+        try {
+            demo.first(-1);
+        } catch (InspireException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("debug >>>> main end");
+    }
+}
+

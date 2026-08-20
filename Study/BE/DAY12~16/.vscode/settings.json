@@ -1,0 +1,6 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "inspire_java_grammar_6th/lib/lombok.jar"
+    ]
+}
